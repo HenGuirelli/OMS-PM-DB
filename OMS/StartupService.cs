@@ -3,7 +3,7 @@
     public class StartupService : IHostedService
     {
         private IServiceProvider _services;
-        private Acceptor _acceptor = new();
+        private readonly Initiator _orderSender = new();
 
         public StartupService(IServiceProvider services)
         {
@@ -12,13 +12,13 @@
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _acceptor.Start();
+            _orderSender.Start();
             return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _acceptor.Stop();
+            _orderSender.Stop();
             return Task.CompletedTask;
         }
     }

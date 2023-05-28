@@ -23,6 +23,11 @@ namespace OMS
             _theOnlySession = _initiator.GetSessionIDs().Single();
         }
 
+        public void Stop()
+        {
+            _initiator.Stop();
+        }
+
         public void SendOrder(Order order)
         {
             var newOrderSingle = new QuickFix.FIX44.NewOrderSingle
