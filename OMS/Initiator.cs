@@ -1,20 +1,24 @@
-﻿using QuickFix;
+﻿using OMS.Repositories;
+using QuickFix;
 using QuickFix.Fields;
 using QuickFix.Transport;
+using System.Reflection.PortableExecutable;
 
 namespace OMS
 {
     internal class Initiator : MessageCracker, IApplication
     {
         private readonly SocketInitiator _initiator;
+        private readonly IOrderRepository _orderRepository;
         private SessionID? _theOnlySession;
 
-        public Initiator()
+        public Initiator(IOrderRepository orderRepository)
         {
             var _settings = new SessionSettings("quickfix.cfg");
             IMessageStoreFactory storeFactory = new FileStoreFactory(_settings);
             var logFactory = new FileLogFactory(_settings);
             _initiator = new SocketInitiator(this, storeFactory, _settings, logFactory);
+            _orderRepository = orderRepository;
         }
 
         public void Start()
@@ -90,23 +94,44 @@ namespace OMS
                 Price = n.Price.getValue(),
                 Side = n.Side.getValue(),
                 Symbol = n.Symbol.getValue(),
-                Status = n.OrdStatus.getValue().ToString(),
+                Status = GetStatus(n.OrdStatus.getValue().ToString()),
             };
 
-            if (er.Status == "0")
+            var order = new Order
             {
-                OrderRepository.CreateOrder(er);
-            }
+                OrderId = er.OrderId,
+                Account = er.Account,
+                ClOrdId = er.ClOrdId,
+                Quantity = er.Quantity,
+                ExecutedQuantity = er.CumQty,
+                Price = er.Price,
+                Status = er.Status,
+                Symbol = er.Symbol,
+            };
 
-            //OrderRepository.AddExecutionReport(er);
-            var order = OrderRepository.GetOrderByClOrdID(er.ClOrdId);
-            if (n.OrdStatus.getValue() == '0')
+            if (er.Status == "NEW")
             {
-                order.New();
+                _orderRepository.AddOrder(order);
             }
-            if (n.OrdStatus.getValue() == '2')
+            else
             {
-                order.Filled();
+                _orderRepository.UpdateOrder(order);
+            }
+        }
+
+        private static string GetStatus(string v)
+        {
+            if (v == "0")
+            {
+                return "NEW";
+            }
+            else if (v == "1")
+            {
+                return "PARTIALLY FILLED";
+            }
+            else
+            {
+                return "FILLED";
             }
         }
 

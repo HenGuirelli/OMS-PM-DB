@@ -11,17 +11,5 @@
         public virtual decimal Price { get; set; }
         public virtual string Status { get; set; }
         public virtual string Symbol { get; set; }
-
-        public void New()
-        {
-            Status = "NEW";
-        }
-
-        public void Filled()
-        {
-            Status = "FILLED";
-        }
-
-        public virtual List<ExecutionReport> ExecutionReports { get; set; }
     }
 }

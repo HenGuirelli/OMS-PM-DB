@@ -1,4 +1,5 @@
 using OMS;
+using OMS.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +9,15 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+var settings = builder.Configuration.Get<Settings>();
+
 builder.Services.AddHostedService<StartupService>();
+builder.Services.AddSingleton<IOrderRepository, SqlLiteOrderRepository>(
+    serviceProvider =>
+    {
+        return new SqlLiteOrderRepository(settings.ConnectionString);
+    });
 
 var app = builder.Build();
 

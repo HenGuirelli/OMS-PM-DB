@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using OMS.Repositories;
 
 namespace OMS.Controllers
 {
@@ -7,16 +8,26 @@ namespace OMS.Controllers
     public class OrderController : ControllerBase
     {
         private readonly ILogger<OrderController> _logger;
+        private readonly IOrderRepository _orderRepository;
 
-        public OrderController(ILogger<OrderController> logger)
+        public OrderController(
+            ILogger<OrderController> logger,
+            IOrderRepository orderRepository)
         {
             _logger = logger;
+            _orderRepository = orderRepository;
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
+        [HttpGet("all")]
         public IEnumerable<Order> Get()
         {
-            return OrderRepository.Orders;
+            return _orderRepository.GetAllOrders();
+        }
+
+        [HttpGet("{clOrdId}")]
+        public Order Get(string clOrdId)
+        {
+            return _orderRepository.GetOrderByClOrdId(clOrdId);
         }
     }
 }

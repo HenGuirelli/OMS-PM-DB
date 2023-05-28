@@ -1,13 +1,16 @@
-﻿namespace OMS
+﻿using OMS.Repositories;
+
+namespace OMS
 {
     public class StartupService : IHostedService
     {
-        private IServiceProvider _services;
-        private readonly Initiator _orderSender = new();
+        private readonly IServiceProvider _services;
+        private readonly Initiator _orderSender;
 
         public StartupService(IServiceProvider services)
         {
             _services = services;
+            _orderSender = new (_services.GetRequiredService<IOrderRepository>());
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
