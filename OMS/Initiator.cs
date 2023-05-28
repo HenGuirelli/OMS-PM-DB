@@ -7,7 +7,7 @@ namespace OMS
     internal class Initiator : MessageCracker, IApplication
     {
         private readonly SocketInitiator _initiator;
-        private SessionID _theOnlySession;
+        private SessionID? _theOnlySession;
 
         public Initiator()
         {
@@ -42,6 +42,7 @@ namespace OMS
 
             Session.SendToTarget(newOrderSingle, _theOnlySession);
         }
+
         #region quickfix callbacks
         public void FromAdmin(Message message, SessionID sessionID)
         {
@@ -74,7 +75,6 @@ namespace OMS
         {
         }
         #endregion
-
 
         public void OnMessage(QuickFix.FIX44.ExecutionReport n, SessionID s)
         {
