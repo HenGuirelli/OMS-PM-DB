@@ -2,12 +2,12 @@
 using QuickFix;
 using QuickFix.Fields;
 using QuickFix.Transport;
-using System.Reflection.PortableExecutable;
 
 namespace OMS
 {
     internal class Initiator : MessageCracker, IApplication
     {
+        private readonly ExecutionReportCounter _executionReportCounter = new();
         private readonly SocketInitiator _initiator;
         private readonly IOrderRepository _orderRepository;
         private SessionID? _theOnlySession;
@@ -82,6 +82,8 @@ namespace OMS
 
         public void OnMessage(QuickFix.FIX44.ExecutionReport n, SessionID s)
         {
+            _executionReportCounter.AddEr();
+
             var er = new ExecutionReport
             {
                 Account = n.Account.getValue(),
