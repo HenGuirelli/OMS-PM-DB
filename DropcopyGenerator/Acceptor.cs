@@ -7,7 +7,7 @@ namespace DropcopyGenerator
         private readonly ThreadedSocketAcceptor _acceptor;
         private readonly OrderSender _orderSender = new OrderSender();
         private volatile int _ordersSended = 0;
-        private const int MaxOrdersSendAtSameTime = 10;
+        private const int MaxOrdersSendAtSameTime = 1;
         private Thread _managerThread;
 
         public Acceptor()
@@ -48,7 +48,7 @@ namespace DropcopyGenerator
                             _ordersSended--;
                         });
                     }
-                    Thread.Sleep(1000);
+                    Thread.Sleep(5000);
                 }
             });
             _managerThread.Name = "Manager thread";

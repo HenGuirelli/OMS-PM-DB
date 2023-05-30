@@ -20,7 +20,7 @@ namespace DropcopyGenerator
                 Account = _random.Next(1111, 99999).ToString(),
                 ClOrdId = Guid.NewGuid().ToString(),
                 OrderId = _random.Next(1111, 99999).ToString(),
-                Price = (decimal)(_random.Next() + _random.NextDouble()),
+                Price = (decimal)(_random.Next(1000) + _random.NextDouble()),
                 Quantity = _random.Next(10_000),
                 Status = "0", // new
                 Symbol = _symbols[_random.Next(_symbols.Count)],
