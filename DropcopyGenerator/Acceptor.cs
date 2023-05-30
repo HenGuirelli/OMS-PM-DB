@@ -40,15 +40,7 @@ namespace DropcopyGenerator
             {
                 while (true)
                 {
-                    for (; _ordersSended < MaxOrdersSendAtSameTime; _ordersSended++)
-                    {
-                        Task.Run(() =>
-                        {
-                            _orderSender.Start(Session.LookupSession(sessionID));
-                            _ordersSended--;
-                        });
-                    }
-                    Thread.Sleep(5000);
+                    _orderSender.Start(Session.LookupSession(sessionID));
                 }
             });
             _managerThread.Name = "Manager thread";

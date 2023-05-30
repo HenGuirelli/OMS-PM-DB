@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using OMS;
 using OMS.Repositories;
 
@@ -13,11 +14,13 @@ builder.Services.AddSwaggerGen();
 var settings = builder.Configuration.Get<Settings>();
 
 builder.Services.AddHostedService<StartupService>();
-builder.Services.AddSingleton<IOrderRepository, SqlLiteOrderRepository>(
-    serviceProvider =>
-    {
-        return new SqlLiteOrderRepository(settings.ConnectionString);
-    });
+//builder.Services.AddSingleton<IOrderRepository, SqlLiteOrderRepository>(
+//    serviceProvider =>
+//    {
+//        return new SqlLiteOrderRepository(settings.ConnectionString);
+//    });
+builder.Services.AddSingleton<IOrderRepository, MemoryOrderRepository>();
+
 
 var app = builder.Build();
 
