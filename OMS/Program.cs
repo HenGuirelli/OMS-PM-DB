@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using OMS;
 using OMS.Repositories;
+using PM.Configs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,12 +15,26 @@ builder.Services.AddSwaggerGen();
 var settings = builder.Configuration.Get<Settings>();
 
 builder.Services.AddHostedService<StartupService>();
-//builder.Services.AddSingleton<IOrderRepository, SqlLiteOrderRepository>(
-//    serviceProvider =>
-//    {
-//        return new SqlLiteOrderRepository(settings.ConnectionString);
-//    });
-builder.Services.AddSingleton<IOrderRepository, MemoryOrderRepository>();
+builder.Services.AddSingleton<IOrderRepository>(
+    serviceProvider =>
+    {
+        if (settings.Persistency.ToLower() == "sqlite")
+            return new SqlLiteOrderRepository(settings.SqlLite!.ConnectionString);
+
+        if (settings.Persistency.ToLower() == "memory")
+            return new MemoryOrderRepository();
+
+        if (settings.Persistency.ToLower() == "pm")
+        {
+            PmGlobalConfiguration.PmInternalsFolder = settings.Pm!.InternalsFolder;
+            PmGlobalConfiguration.PmTarget = PM.Core.PmTargets.TraditionalMemoryMappedFile;
+
+            return new PmOrderRepository(settings.Pm!.OrdersFilePath);
+        }
+
+        throw new ApplicationException("Invalid config " + settings.Persistency.ToLower());
+    });
+//builder.Services.AddSingleton<IOrderRepository, MemoryOrderRepository>();
 
 
 var app = builder.Build();
