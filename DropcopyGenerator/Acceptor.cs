@@ -6,9 +6,8 @@ namespace DropcopyGenerator
     {
         private readonly ThreadedSocketAcceptor _acceptor;
         private readonly OrderSender _orderSender = new OrderSender();
-        private volatile int _ordersSended = 0;
-        private const int MaxOrdersSendAtSameTime = 1;
-        private Thread _managerThread;
+        private Thread? _managerThread;
+        private volatile bool _managerThreadRunning = false;
 
         public Acceptor()
         {
@@ -36,9 +35,10 @@ namespace DropcopyGenerator
         public void OnLogon(SessionID sessionID)
         {
             Console.WriteLine("Logon " + sessionID);
+            _managerThreadRunning = true;
             _managerThread = new Thread(() =>
             {
-                while (true)
+                while (_managerThreadRunning)
                 {
                     if (!_orderSender.Start(Session.LookupSession(sessionID)))
                     {
@@ -66,6 +66,7 @@ namespace DropcopyGenerator
         public void Dispose()
         {
             _acceptor.Dispose();
+            _managerThreadRunning = false;
         }
     }
 }

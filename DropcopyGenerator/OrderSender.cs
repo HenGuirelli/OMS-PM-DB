@@ -13,7 +13,7 @@ namespace DropcopyGenerator
             var firstErConverterd = _converter.Convert(firstEr);
             session.Send(firstErConverterd);
 
-            OMS.ExecutionReport er = _orderGenerator.NextER(firstEr);
+            OMS.ExecutionReport? er = _orderGenerator.NextER(firstEr);
             while (er != null)
             {
                 var erConverted = _converter.Convert(er);

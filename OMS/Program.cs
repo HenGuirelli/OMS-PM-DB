@@ -20,6 +20,9 @@ builder.Services.AddSingleton<IOrderRepository>(
     {
         if (settings.Persistency.ToLower() == "sqlite")
             return new SqlLiteOrderRepository(settings.SqlLite!.ConnectionString);
+        
+        if (settings.Persistency.ToLower() == "sqliteoptimized")
+            return new SqlLiteOptimizedOrderRepository(settings.SqlLite!.ConnectionString);
 
         if (settings.Persistency.ToLower() == "memory")
             return new MemoryOrderRepository();
