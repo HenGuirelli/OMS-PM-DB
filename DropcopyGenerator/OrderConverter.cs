@@ -16,7 +16,7 @@ namespace DropcopyGenerator
                 OrderID = new OrderID(firstEr.OrderId),
                 LastQty = new LastQty(firstEr.LastQty),
                 ExecType = new ExecType(firstEr.ExecType[0]),
-                OrdStatus = new OrdStatus(firstEr.Status[0]),
+                OrdStatus = new OrdStatus(firstEr.Status.ToString()[0]),
                 CumQty = new CumQty(firstEr.CumQty),
                 LeavesQty = new LeavesQty(firstEr.LeavesQuantity),
                 NoPartyIDs = new NoPartyIDs(0),

@@ -22,7 +22,7 @@ namespace DropcopyGenerator
                 OrderId = _random.Next(1111, 99999).ToString(),
                 Price = (decimal)(_random.Next(1000) + _random.NextDouble()),
                 Quantity = _random.Next(10_000),
-                Status = "0", // new
+                Status = 0, // new
                 Symbol = _symbols[_random.Next(_symbols.Count)],
                 Side = _random.Next(10) % 2 == 0 ? '1' : '2',
                 LastQty = 0,
@@ -37,11 +37,11 @@ namespace DropcopyGenerator
 
             if (oldEr.LeavesQuantity > 1)
             {
-                er = CreateNextER(oldEr, "1");
+                er = CreateNextER(oldEr, 1);
             }
             else if (oldEr.LeavesQuantity == 1)
             {
-                er = CreateNextER(oldEr, "2");
+                er = CreateNextER(oldEr, 2);
             }
 
             return er;
@@ -49,7 +49,7 @@ namespace DropcopyGenerator
 
         private static ExecutionReport CreateNextER(
             ExecutionReport oldEr,
-            string status)
+            int status)
         {
             return new ExecutionReport
             {

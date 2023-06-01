@@ -96,7 +96,7 @@ namespace OMS
                 Price = n.Price.getValue(),
                 Side = n.Side.getValue(),
                 Symbol = n.Symbol.getValue(),
-                Status = GetStatus(n.OrdStatus.getValue().ToString()),
+                Status = int.Parse(n.OrdStatus.getValue().ToString()),
             };
 
             var order = new Order
@@ -111,29 +111,13 @@ namespace OMS
                 Symbol = er.Symbol,
             };
 
-            if (er.Status == "NEW")
+            if (er.Status == 0) // NEW
             {
                 _orderRepository.AddOrder(order);
             }
             else
             {
                 _orderRepository.UpdateOrder(order);
-            }
-        }
-
-        private static string GetStatus(string v)
-        {
-            if (v == "0")
-            {
-                return "NEW";
-            }
-            else if (v == "1")
-            {
-                return "PARTIALLY FILLED";
-            }
-            else
-            {
-                return "FILLED";
             }
         }
 

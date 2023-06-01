@@ -9,7 +9,7 @@
         public virtual decimal ExecutedQuantity { get; set; }
         public virtual decimal LeavesQuantity => Quantity - ExecutedQuantity;
         public virtual decimal Price { get; set; }
-        public virtual string Status { get; set; }
+        public virtual int Status { get; set; }
         public virtual string Symbol { get; set; }
     }
 }

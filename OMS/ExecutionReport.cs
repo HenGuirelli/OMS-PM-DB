@@ -11,7 +11,7 @@
         public virtual decimal Price { get; set; }
         public virtual decimal LeavesQuantity => Quantity - CumQty;
         public virtual string ExecType { get; set; } = "pending new";
-        public string Status { get; set; }
+        public int Status { get; set; }
         public string Symbol { get; set; }
         public char Side { get; set; } = '1';
     }

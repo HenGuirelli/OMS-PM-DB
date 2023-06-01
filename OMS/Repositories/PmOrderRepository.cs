@@ -5,6 +5,7 @@ namespace OMS.Repositories
     public class PmOrderRepository : IOrderRepository
     {
         private readonly PmList<Order> _orders;
+        private readonly Dictionary<string, Order> _ordersByClOrderId = new();
 
         public PmOrderRepository(string filePath)
         {
@@ -13,7 +14,7 @@ namespace OMS.Repositories
 
         public void AddOrder(Order order)
         {
-            _orders.AddPersistent(order);
+            _ordersByClOrderId[order.ClOrdId] = _orders.AddPersistent(order);
         }
 
         public IEnumerable<Order> GetAllOrders()
@@ -23,6 +24,11 @@ namespace OMS.Repositories
 
         public Order GetOrderByClOrdId(string clOrdID)
         {
+            if (_ordersByClOrderId.TryGetValue(clOrdID, out var result))
+            {
+                return result;
+            }
+
             foreach (var order in _orders)
             {
                 if (order.ClOrdId == clOrdID) return order;
@@ -32,7 +38,9 @@ namespace OMS.Repositories
 
         public void UpdateOrder(Order order)
         {
-            // Nothing to see here
+            var pmOrder = GetOrderByClOrdId(order.ClOrdId);
+            pmOrder.Status = order.Status;
+            pmOrder.ExecutedQuantity = order.ExecutedQuantity;
         }
     }
 }

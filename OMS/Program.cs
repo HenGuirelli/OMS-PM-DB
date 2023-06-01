@@ -27,7 +27,7 @@ builder.Services.AddSingleton<IOrderRepository>(
         if (settings.Persistency.ToLower() == "pm")
         {
             PmGlobalConfiguration.PmInternalsFolder = settings.Pm!.InternalsFolder;
-            PmGlobalConfiguration.PmTarget = PM.Core.PmTargets.TraditionalMemoryMappedFile;
+            PmGlobalConfiguration.PmTarget = PM.Core.PmTargets.PM;
 
             return new PmOrderRepository(settings.Pm!.OrdersFilePath);
         }

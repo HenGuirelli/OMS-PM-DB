@@ -53,15 +53,11 @@ namespace OMS.Repositories
         {
             using (var command = connection.CreateCommand())
             {
-                command.CommandText = "UPDATE Orders SET Account = @Account, Quantity = @Quantity, " +
-                                      "ExecutedQuantity = @ExecutedQuantity, Price = @Price, " +
-                                      "Status = @Status, Symbol = @Symbol WHERE OrderId = @OrderId";
-                command.Parameters.AddWithValue("@Account", order.Account);
-                command.Parameters.AddWithValue("@Quantity", order.Quantity);
+                command.CommandText = "UPDATE Orders SET " +
+                                      "ExecutedQuantity = @ExecutedQuantity, Status = @Status " +
+                                      "WHERE OrderId = @OrderId";
                 command.Parameters.AddWithValue("@ExecutedQuantity", order.ExecutedQuantity);
-                command.Parameters.AddWithValue("@Price", order.Price);
                 command.Parameters.AddWithValue("@Status", order.Status);
-                command.Parameters.AddWithValue("@Symbol", order.Symbol);
                 command.Parameters.AddWithValue("@OrderId", order.OrderId);
 
                 command.ExecuteNonQuery();
@@ -92,7 +88,7 @@ namespace OMS.Repositories
                                 Quantity = reader.GetDecimal(3),
                                 ExecutedQuantity = reader.GetDecimal(4),
                                 Price = reader.GetDecimal(5),
-                                Status = reader.GetString(6),
+                                Status = reader.GetInt32(6),
                                 Symbol = reader.GetString(7)
                             };
 
@@ -128,7 +124,7 @@ namespace OMS.Repositories
                                 Quantity = reader.GetDecimal(3),
                                 ExecutedQuantity = reader.GetDecimal(4),
                                 Price = reader.GetDecimal(5),
-                                Status = reader.GetString(6),
+                                Status = reader.GetInt32(6),
                                 Symbol = reader.GetString(7)
                             };
 
