@@ -16,6 +16,7 @@ namespace OMS.Repositories
             using (var connection = new SqliteConnection(connectionString))
             using (var command = connection.CreateCommand())
             {
+                connection.Open();
                 command.CommandText = "INSERT INTO Orders (OrderId, Account, ClOrdId, Quantity, ExecutedQuantity, Price, Status, Symbol) " +
                                       "VALUES (@OrderId, @Account, @ClOrdId, @Quantity, @ExecutedQuantity, @Price, @Status, @Symbol)";
                 command.Parameters.AddWithValue("@OrderId", order.OrderId);
@@ -36,6 +37,7 @@ namespace OMS.Repositories
             using (var connection = new SqliteConnection(connectionString))
             using (var command = connection.CreateCommand())
             {
+                connection.Open();
                 command.CommandText = "UPDATE Orders SET " +
                                       "ExecutedQuantity = @ExecutedQuantity, Status = @Status " +
                                       "WHERE OrderId = @OrderId";

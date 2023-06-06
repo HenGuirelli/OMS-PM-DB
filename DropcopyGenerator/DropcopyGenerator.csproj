@@ -17,6 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="FIX44EntrypointGatewayEquities.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="quickfix.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
