@@ -15,7 +15,8 @@ namespace OMS
         public Initiator(IOrderRepository orderRepository)
         {
             var _settings = new SessionSettings("quickfix.cfg");
-            IMessageStoreFactory storeFactory = new FileStoreFactory(_settings);
+            //IMessageStoreFactory storeFactory = new FileStoreFactory(_settings);
+            IMessageStoreFactory storeFactory = new PmFileStoreFactory(_settings);
             var logFactory = new FileLogFactory(_settings);
             _initiator = new SocketInitiator(this, storeFactory, _settings, logFactory);
             _orderRepository = orderRepository;

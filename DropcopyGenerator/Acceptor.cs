@@ -1,4 +1,5 @@
-﻿using QuickFix;
+﻿using PM.Configs;
+using QuickFix;
 
 namespace DropcopyGenerator
 {
@@ -12,7 +13,22 @@ namespace DropcopyGenerator
         public Acceptor()
         {
             var settings = new SessionSettings("quickfix.cfg");
-            IMessageStoreFactory storeFactory = new FileStoreFactory(settings);
+
+            PmGlobalConfiguration.PmInternalsFolder = "/mnt/nvram1/henguirelli";
+            string os = Environment.OSVersion.Platform.ToString();
+
+            if (os.StartsWith("Win"))
+            {
+                Console.WriteLine("Ambiente Windows, usando arquivos mapeados em memória tradicionais");
+                PmGlobalConfiguration.PmTarget = PM.Core.PmTargets.TraditionalMemoryMappedFile;
+            }
+            else
+            {
+                Console.WriteLine("Ambiente Linux, usando PM");
+                PmGlobalConfiguration.PmTarget = PM.Core.PmTargets.PM;
+            }
+
+            IMessageStoreFactory storeFactory = new PmFileStoreFactory(settings);
 
             ILogFactory logFactory = new FileLogFactory(settings);
             _acceptor =

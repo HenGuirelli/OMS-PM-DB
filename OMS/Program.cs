@@ -18,20 +18,38 @@ builder.Services.AddHostedService<StartupService>();
 builder.Services.AddSingleton<IOrderRepository>(
     serviceProvider =>
     {
+        PmGlobalConfiguration.PmInternalsFolder = settings.Pm!.InternalsFolder;
+        string os = Environment.OSVersion.Platform.ToString();
+
+        if (os.StartsWith("Win"))
+        {
+            Console.WriteLine("Ambiente Windows, usando arquivos mapeados em memória tradicionais");
+            PmGlobalConfiguration.PmTarget = PM.Core.PmTargets.TraditionalMemoryMappedFile;
+        }
+        else
+        {
+            Console.WriteLine("Ambiente Linux, usando PM");
+            PmGlobalConfiguration.PmTarget = PM.Core.PmTargets.PM;
+        }
+
+        Console.WriteLine("Persistencia: " + settings.Persistency);
         if (settings.Persistency.ToLower() == "sqlite")
             return new SqlLiteOrderRepository(settings.SqlLite!.ConnectionString);
         
         if (settings.Persistency.ToLower() == "sqliteoptimized")
             return new SqlLiteOptimizedOrderRepository(settings.SqlLite!.ConnectionString);
 
+        if (settings.Persistency.ToLower() == "postgresql")
+            return new PostgreSqlOrderRepository(settings.PostgreSQL!.ConnectionString);
+        
+        if (settings.Persistency.ToLower() == "postgresqloptimized")
+            return new PostgreSqlOptimizedOrderRepository(settings.PostgreSQL!.ConnectionString);
+
         if (settings.Persistency.ToLower() == "memory")
             return new MemoryOrderRepository();
 
         if (settings.Persistency.ToLower() == "pm")
         {
-            PmGlobalConfiguration.PmInternalsFolder = settings.Pm!.InternalsFolder;
-            PmGlobalConfiguration.PmTarget = PM.Core.PmTargets.TraditionalMemoryMappedFile;
-
             return new PmOrderRepository(settings.Pm!.OrdersFilePath);
         }
 

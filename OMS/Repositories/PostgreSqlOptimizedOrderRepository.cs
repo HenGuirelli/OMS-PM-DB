@@ -1,29 +1,34 @@
 ﻿using Microsoft.Data.Sqlite;
+using Npgsql;
 
 namespace OMS.Repositories
 {
-    public class SqlLiteOptimizedOrderRepository : IOrderRepository, IDisposable
+    public class PostgreSqlOptimizedOrderRepository : IOrderRepository, IDisposable
     {
         private readonly string connectionString;
-        private readonly SqliteConnection connection;
+        private readonly NpgsqlConnection connection;
         private readonly System.Timers.Timer _timer = new();
-        private SqliteTransaction? _transaction;
+        private NpgsqlTransaction? _transaction;
+        private static object _lock = new object();
 
-        public SqlLiteOptimizedOrderRepository(string connectionString)
+        public PostgreSqlOptimizedOrderRepository(string connectionString)
         {
             this.connectionString = connectionString;
-            connection = new SqliteConnection(connectionString);
+            connection = new NpgsqlConnection(connectionString);
             connection.Open();
 
             _transaction = connection.BeginTransaction();
 
             _timer.Elapsed += (o, e) =>
             {
-                var tx = _transaction;
-                _transaction = null;
+                lock (_lock)
+                {
+                    var tx = _transaction;
+                    _transaction = null;
 
-                tx.Commit();
-                _transaction = connection.BeginTransaction();
+                    tx.Commit();
+                    _transaction = connection.BeginTransaction();
+                }
             };
             _timer.AutoReset = true;
             _timer.Interval = 1000;
@@ -32,35 +37,43 @@ namespace OMS.Repositories
 
         public void AddOrder(Order order)
         {
-            using (var command = connection.CreateCommand())
+            lock (_lock)
             {
-                command.CommandText = "INSERT INTO Orders (OrderId, Account, ClOrdId, Quantity, ExecutedQuantity, Price, Status, Symbol) " +
-                                      "VALUES (@OrderId, @Account, @ClOrdId, @Quantity, @ExecutedQuantity, @Price, @Status, @Symbol)";
-                command.Parameters.AddWithValue("@OrderId", order.OrderId);
-                command.Parameters.AddWithValue("@Account", order.Account);
-                command.Parameters.AddWithValue("@ClOrdId", order.ClOrdId);
-                command.Parameters.AddWithValue("@Quantity", order.Quantity);
-                command.Parameters.AddWithValue("@ExecutedQuantity", order.ExecutedQuantity);
-                command.Parameters.AddWithValue("@Price", order.Price);
-                command.Parameters.AddWithValue("@Status", order.Status);
-                command.Parameters.AddWithValue("@Symbol", order.Symbol);
+                using (var command = connection.CreateCommand())
+                {
+                    command.Transaction = _transaction;
+                    command.CommandText = "INSERT INTO Orders (OrderId, Account, ClOrdId, Quantity, ExecutedQuantity, Price, Status, Symbol) " +
+                                          "VALUES (@OrderId, @Account, @ClOrdId, @Quantity, @ExecutedQuantity, @Price, @Status, @Symbol)";
+                    command.Parameters.AddWithValue("@OrderId", order.OrderId);
+                    command.Parameters.AddWithValue("@Account", order.Account);
+                    command.Parameters.AddWithValue("@ClOrdId", order.ClOrdId);
+                    command.Parameters.AddWithValue("@Quantity", order.Quantity);
+                    command.Parameters.AddWithValue("@ExecutedQuantity", order.ExecutedQuantity);
+                    command.Parameters.AddWithValue("@Price", order.Price);
+                    command.Parameters.AddWithValue("@Status", order.Status);
+                    command.Parameters.AddWithValue("@Symbol", order.Symbol);
 
-                command.ExecuteNonQuery();
+                    command.ExecuteNonQuery();
+                }
             }
         }
 
         public void UpdateOrder(Order order)
         {
-            using (var command = connection.CreateCommand())
+            lock (_lock)
             {
-                command.CommandText = "UPDATE Orders SET " +
-                                      "ExecutedQuantity = @ExecutedQuantity, Status = @Status " +
-                                      "WHERE OrderId = @OrderId";
-                command.Parameters.AddWithValue("@ExecutedQuantity", order.ExecutedQuantity);
-                command.Parameters.AddWithValue("@Status", order.Status);
-                command.Parameters.AddWithValue("@OrderId", order.OrderId);
+                using (var command = connection.CreateCommand())
+                {
+                    command.Transaction = _transaction;
+                    command.CommandText = "UPDATE Orders SET " +
+                                          "ExecutedQuantity = @ExecutedQuantity, Status = @Status " +
+                                          "WHERE OrderId = @OrderId";
+                    command.Parameters.AddWithValue("@ExecutedQuantity", order.ExecutedQuantity);
+                    command.Parameters.AddWithValue("@Status", order.Status);
+                    command.Parameters.AddWithValue("@OrderId", order.OrderId);
 
-                command.ExecuteNonQuery();
+                    command.ExecuteNonQuery();
+                }
             }
         }
 
