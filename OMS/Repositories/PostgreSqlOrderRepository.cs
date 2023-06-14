@@ -16,17 +16,37 @@ namespace OMS.Repositories
             using (var connection = new NpgsqlConnection(connectionString))
             {
                 connection.Open();
-                using (var command = new NpgsqlCommand("INSERT INTO public.Orders (OrderId, Account, ClOrdId, Quantity, ExecutedQuantity, Price, Status, Symbol) VALUES (@OrderId, @Account, @ClOrdId, @Quantity, @ExecutedQuantity, @Price, @Status, @Symbol)", connection))
+                var tx = connection.BeginTransaction();
+                try
                 {
-                    command.Parameters.AddWithValue("OrderId", order.OrderId);
-                    command.Parameters.AddWithValue("Account", order.Account);
-                    command.Parameters.AddWithValue("ClOrdId", order.ClOrdId);
-                    command.Parameters.AddWithValue("Quantity", order.Quantity);
-                    command.Parameters.AddWithValue("ExecutedQuantity", order.ExecutedQuantity);
-                    command.Parameters.AddWithValue("Price", order.Price);
-                    command.Parameters.AddWithValue("Status", order.Status);
-                    command.Parameters.AddWithValue("Symbol", order.Symbol);
-                    command.ExecuteNonQuery();
+                    using (var command = new NpgsqlCommand(
+                        "INSERT INTO Orders (OrderId, Account, ClOrdId, Quantity, ExecutedQuantity, Price, Status, Symbol) VALUES (@OrderId, @Account, @ClOrdId, @Quantity, @ExecutedQuantity, @Price, @Status, @Symbol)", connection))
+                    {
+                        command.Transaction = tx;
+                        command.Parameters.AddWithValue("OrderId", order.OrderId);
+                        command.Parameters.AddWithValue("Account", order.Account);
+                        command.Parameters.AddWithValue("ClOrdId", order.ClOrdId);
+                        command.Parameters.AddWithValue("Quantity", order.Quantity);
+                        command.Parameters.AddWithValue("ExecutedQuantity", order.ExecutedQuantity);
+                        command.Parameters.AddWithValue("Price", order.Price);
+                        command.Parameters.AddWithValue("Status", order.Status);
+                        command.Parameters.AddWithValue("Symbol", order.Symbol);
+                        command.ExecuteNonQuery();
+                    }
+                    using (var command = new NpgsqlCommand(
+                        "UPDATE contacorrente set = value - @Value where account = @Account ", connection))
+                    {
+                        command.Transaction = tx;
+                        command.Parameters.AddWithValue("Account", order.Account);
+                        command.Parameters.AddWithValue("Value", order.Price);
+                        command.ExecuteNonQuery();
+                    }
+
+                    tx.Commit();
+                }
+                catch (Exception ex)
+                {
+                    tx.Rollback();
                 }
             }
         }

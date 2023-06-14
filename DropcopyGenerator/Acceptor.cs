@@ -28,7 +28,8 @@ namespace DropcopyGenerator
                 PmGlobalConfiguration.PmTarget = PM.Core.PmTargets.PM;
             }
 
-            IMessageStoreFactory storeFactory = new PmFileStoreFactory(settings);
+            //IMessageStoreFactory storeFactory = new PmFileStoreFactory(settings);
+            IMessageStoreFactory storeFactory = new FileStoreFactory(settings);
 
             ILogFactory logFactory = new FileLogFactory(settings);
             _acceptor =

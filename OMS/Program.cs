@@ -53,9 +53,13 @@ builder.Services.AddSingleton<IOrderRepository>(
             return new PmOrderRepository(settings.Pm!.OrdersFilePath);
         }
 
+        if (settings.Persistency.ToLower() == "pmtransaction")
+        {
+            return new PmTransactionOrderRepository(settings.Pm!.OrdersFilePath);
+        }
+
         throw new ApplicationException("Invalid config " + settings.Persistency.ToLower());
     });
-//builder.Services.AddSingleton<IOrderRepository, MemoryOrderRepository>();
 
 
 var app = builder.Build();
