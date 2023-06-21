@@ -12,20 +12,21 @@ namespace DropcopyGenerator
 
         public Acceptor()
         {
-            var settings = new SessionSettings("quickfix.cfg");
 
             PmGlobalConfiguration.PmInternalsFolder = "/mnt/nvram1/henguirelli";
             string os = Environment.OSVersion.Platform.ToString();
-
+            SessionSettings? settings;
             if (os.StartsWith("Win"))
             {
                 Console.WriteLine("Ambiente Windows, usando arquivos mapeados em memória tradicionais");
                 PmGlobalConfiguration.PmTarget = PM.Core.PmTargets.TraditionalMemoryMappedFile;
+                settings = new SessionSettings("quickfix.win.cfg");
             }
             else
             {
                 Console.WriteLine("Ambiente Linux, usando PM");
                 PmGlobalConfiguration.PmTarget = PM.Core.PmTargets.PM;
+                settings = new SessionSettings("quickfix.linux.cfg");
             }
 
             //IMessageStoreFactory storeFactory = new PmFileStoreFactory(settings);

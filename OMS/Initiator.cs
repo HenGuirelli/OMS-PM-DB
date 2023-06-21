@@ -14,11 +14,20 @@ namespace OMS
 
         public Initiator(IOrderRepository orderRepository)
         {
-            var _settings = new SessionSettings("quickfix.cfg");
-            IMessageStoreFactory storeFactory = new FileStoreFactory(_settings);
-            //IMessageStoreFactory storeFactory = new PmFileStoreFactory(_settings);
-            var logFactory = new FileLogFactory(_settings);
-            _initiator = new SocketInitiator(this, storeFactory, _settings, logFactory);
+            SessionSettings? settings;
+            if (Environment.OSVersion.Platform.ToString().StartsWith("Win"))
+            {
+                settings = new SessionSettings("quickfix.win.cfg");
+            }
+            else
+            {
+                settings = new SessionSettings("quickfix.linux.cfg");
+            }
+
+            IMessageStoreFactory storeFactory = new FileStoreFactory(settings);
+            //IMessageStoreFactory storeFactory = new PmFileStoreFactory(settings);
+            var logFactory = new FileLogFactory(settings);
+            _initiator = new SocketInitiator(this, storeFactory, settings, logFactory);
             _orderRepository = orderRepository;
         }
 

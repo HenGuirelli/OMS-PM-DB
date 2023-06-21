@@ -24,9 +24,14 @@
     <None Update="FIX44EntrypointGatewayEquities.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="quickfix.cfg">
+    <None Update="quickfix.linux.cfg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="quickfix.win.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="{" /></VisualStudio></ProjectExtensions>
 
 </Project>
