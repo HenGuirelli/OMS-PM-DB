@@ -121,13 +121,20 @@ namespace OMS
                 Symbol = er.Symbol,
             };
 
-            if (er.Status == 0) // NEW
+            try
             {
-                _orderRepository.AddOrder(order);
+                if (er.Status == 0) // NEW
+                {
+                    _orderRepository.AddOrder(order);
+                }
+                else
+                {
+                    _orderRepository.UpdateOrder(order);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                _orderRepository.UpdateOrder(order);
+                Console.WriteLine(ex);
             }
         }
 

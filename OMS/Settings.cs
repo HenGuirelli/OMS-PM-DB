@@ -14,6 +14,7 @@
     public class Settings
     {
         public string Persistency { get; set; } = string.Empty;
+        public bool UseTraditionalMemoryMappedFiles { get; set; }
         public SettingsDB? SqlLite { get; set; }
         public SettingsDB? PostgreSQL { get; set; }
         public SettingsPm? Pm { get; set; }

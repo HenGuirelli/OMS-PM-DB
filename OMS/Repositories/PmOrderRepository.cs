@@ -39,8 +39,11 @@ namespace OMS.Repositories
         public void UpdateOrder(Order order)
         {
             var pmOrder = GetOrderByClOrdId(order.ClOrdId);
-            pmOrder.Status = order.Status;
-            pmOrder.ExecutedQuantity = order.ExecutedQuantity;
+            if (pmOrder != null)
+            {
+                pmOrder.Status = order.Status;
+                pmOrder.ExecutedQuantity = order.ExecutedQuantity;
+            }
         }
     }
 }
