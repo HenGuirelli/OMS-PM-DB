@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\PM.NET\PM\PM.csproj" />
     <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\DropcopyGenerator\DropcopyGenerator.csproj" />
   </ItemGroup>
 
   <ItemGroup>

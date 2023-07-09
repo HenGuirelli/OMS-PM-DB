@@ -115,6 +115,14 @@ namespace DropcopyGenerator
 "3925",
 "2396"
         };
+        private readonly int _orderQty;
+        private readonly decimal _orderExecutedQty;
+
+        public OrderGenerator(int orderQty, decimal orderExecutedQty)
+        {
+            _orderQty = orderQty;
+            _orderExecutedQty = orderExecutedQty;
+        }
 
         public ExecutionReport NewOrder()
         {
@@ -124,7 +132,7 @@ namespace DropcopyGenerator
                 ClOrdId = Guid.NewGuid().ToString(),
                 OrderId = _random.Next(1111, 99999).ToString(),
                 Price = (decimal)(_random.Next(1000) + _random.NextDouble()),
-                Quantity = 6_000, //_random.Next(10_000),
+                Quantity = _orderQty, //_random.Next(10_000),
                 Status = 0, // new
                 Symbol = _symbols[_random.Next(_symbols.Count)],
                 Side = _random.Next(10) % 2 == 0 ? '1' : '2',
@@ -150,7 +158,7 @@ namespace DropcopyGenerator
             return er;
         }
 
-        private static ExecutionReport CreateNextER(
+        private ExecutionReport CreateNextER(
             ExecutionReport oldEr,
             int status)
         {
@@ -161,8 +169,8 @@ namespace DropcopyGenerator
                 Price = oldEr.Price,
                 Quantity = oldEr.Quantity,
                 OrderId = oldEr.OrderId,
-                LastQty = 1000,
-                CumQty = oldEr.CumQty + 1000,
+                LastQty = _orderExecutedQty,
+                CumQty = oldEr.CumQty + _orderExecutedQty,
                 ExecType = "F",
                 Status = status,
                 Side = oldEr.Side,

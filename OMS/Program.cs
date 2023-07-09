@@ -1,5 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
 using OMS;
+using OMS.OrderSenders;
 using OMS.Repositories;
 using PM.Configs;
 
@@ -14,7 +14,23 @@ builder.Services.AddSwaggerGen();
 
 var settings = builder.Configuration.Get<Settings>();
 
-builder.Services.AddHostedService<StartupService>();
+builder.Services.AddHostedService<StartupService>(services =>
+{
+    var orderProcess = new OrderProcess(services.GetRequiredService<IOrderRepository>());
+    if (settings.ConnectType.ToLower() == "quickfix")
+    {
+        return new StartupService(
+            new InitiatorOrderSender(orderProcess));
+    }
+    else
+    {
+        return new StartupService(
+            new InnerOrderSender(orderProcess, 
+                new DropcopyGenerator.OrderGenerator(
+                    settings!.SelfContainedSettings!.OrderQuantity,
+                    settings!.SelfContainedSettings!.OrderExecutedQuantity)));
+    }
+});
 builder.Services.AddSingleton<IOrderRepository>(
     serviceProvider =>
     {

@@ -20,13 +20,13 @@ namespace DropcopyGenerator
             {
                 Console.WriteLine("Ambiente Windows, usando arquivos mapeados em memória tradicionais");
                 PmGlobalConfiguration.PmTarget = PM.Core.PmTargets.TraditionalMemoryMappedFile;
-                settings = new SessionSettings("quickfix.win.cfg");
+                settings = new SessionSettings("dc.quickfix.win.cfg");
             }
             else
             {
                 Console.WriteLine("Ambiente Linux, usando PM");
                 PmGlobalConfiguration.PmTarget = PM.Core.PmTargets.PM;
-                settings = new SessionSettings("quickfix.linux.cfg");
+                settings = new SessionSettings("dc.quickfix.linux.cfg");
             }
 
             //IMessageStoreFactory storeFactory = new PmFileStoreFactory(settings);

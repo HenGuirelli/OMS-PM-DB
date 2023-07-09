@@ -1,18 +1,16 @@
-﻿using OMS.Repositories;
-using QuickFix;
+﻿using QuickFix;
 using QuickFix.Fields;
 using QuickFix.Transport;
 
-namespace OMS
+namespace OMS.OrderSenders
 {
-    internal class Initiator : MessageCracker, IApplication
+    internal class InitiatorOrderSender : MessageCracker, IApplication, IOrderSender
     {
-        private readonly ExecutionReportCounter _executionReportCounter = new();
         private readonly SocketInitiator _initiator;
-        private readonly IOrderRepository _orderRepository;
+        private readonly OrderProcess _orderProcess;
         private SessionID? _theOnlySession;
 
-        public Initiator(IOrderRepository orderRepository)
+        public InitiatorOrderSender(OrderProcess orderProcess)
         {
             SessionSettings? settings;
             if (Environment.OSVersion.Platform.ToString().StartsWith("Win"))
@@ -28,7 +26,7 @@ namespace OMS
             //IMessageStoreFactory storeFactory = new PmFileStoreFactory(settings);
             var logFactory = new FileLogFactory(settings);
             _initiator = new SocketInitiator(this, storeFactory, settings, logFactory);
-            _orderRepository = orderRepository;
+            _orderProcess = orderProcess;
         }
 
         public void Start()
@@ -92,8 +90,6 @@ namespace OMS
 
         public void OnMessage(QuickFix.FIX44.ExecutionReport n, SessionID s)
         {
-            _executionReportCounter.AddEr();
-
             var er = new ExecutionReport
             {
                 Account = n.Account.getValue(),
@@ -109,33 +105,7 @@ namespace OMS
                 Status = int.Parse(n.OrdStatus.getValue().ToString()),
             };
 
-            var order = new Order
-            {
-                OrderId = er.OrderId,
-                Account = er.Account,
-                ClOrdId = er.ClOrdId,
-                Quantity = er.Quantity,
-                ExecutedQuantity = er.CumQty,
-                Price = er.Price,
-                Status = er.Status,
-                Symbol = er.Symbol,
-            };
-
-            try
-            {
-                if (er.Status == 0) // NEW
-                {
-                    _orderRepository.AddOrder(order);
-                }
-                else
-                {
-                    _orderRepository.UpdateOrder(order);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
+            _orderProcess.Process(er);
         }
 
         private string GetExecType(char execType)

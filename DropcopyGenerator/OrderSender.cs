@@ -5,7 +5,7 @@ namespace DropcopyGenerator
     public class OrderSender
     {
         private readonly OrderConverter _converter = new();
-        private readonly OrderGenerator _orderGenerator = new();
+        private readonly OrderGenerator _orderGenerator = new(8_000, 1_000);
 
         public bool Start(Session session)
         {
