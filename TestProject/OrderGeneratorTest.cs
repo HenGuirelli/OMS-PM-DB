@@ -8,7 +8,7 @@ namespace TestProject
         [Test]
         public void OnGenerator_ShouldFullFilled()
         {
-            var orderGenerator = new OrderGenerator();
+            var orderGenerator = new OrderGenerator(8_000, 1_000);
             var firstExecution = orderGenerator.NewOrder();
 
             ExecutionReport lastEr = null!;

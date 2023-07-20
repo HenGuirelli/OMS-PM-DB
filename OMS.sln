@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickFix", "QuickFIXn\Quick
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickFix.FIX44", "Messages\FIX44\QuickFix.FIX44.csproj", "{F8F5C6F4-7C73-424F-8E76-1D50D4DDF935}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PM.Core", "..\PM.NET\PM.Core\PM.Core.csproj", "{0FD315BA-9DA4-4EDD-B3C8-A045293C051F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,14 @@ Global
 		{F8F5C6F4-7C73-424F-8E76-1D50D4DDF935}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F8F5C6F4-7C73-424F-8E76-1D50D4DDF935}.Release|x64.ActiveCfg = Release|x64
 		{F8F5C6F4-7C73-424F-8E76-1D50D4DDF935}.Release|x64.Build.0 = Release|x64
+		{0FD315BA-9DA4-4EDD-B3C8-A045293C051F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FD315BA-9DA4-4EDD-B3C8-A045293C051F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FD315BA-9DA4-4EDD-B3C8-A045293C051F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0FD315BA-9DA4-4EDD-B3C8-A045293C051F}.Debug|x64.Build.0 = Debug|Any CPU
+		{0FD315BA-9DA4-4EDD-B3C8-A045293C051F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FD315BA-9DA4-4EDD-B3C8-A045293C051F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FD315BA-9DA4-4EDD-B3C8-A045293C051F}.Release|x64.ActiveCfg = Release|Any CPU
+		{0FD315BA-9DA4-4EDD-B3C8-A045293C051F}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
