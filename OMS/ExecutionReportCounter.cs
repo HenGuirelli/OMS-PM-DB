@@ -1,4 +1,6 @@
-﻿namespace OMS
+﻿using Serilog;
+
+namespace OMS
 {
     public class ExecutionReportCounter
     {
@@ -10,7 +12,10 @@
         {
             _timer.Elapsed += (o, e) =>
             {
-                Console.WriteLine("ER count (p/ sec): " + _executionReportCount + "\t| Total: " + _executionReportTotalCount);
+                Log.Information(
+                    "ER count (p/ sec): {executionReportCount}\t| Total: {executionReportTotalCount}",
+                    _executionReportCount, _executionReportTotalCount);
+                //Console.WriteLine("ER count (p/ sec): " + _executionReportCount + "\t| Total: " + _executionReportTotalCount);
                 _executionReportCount = 0;
             };
             _timer.AutoReset = true;

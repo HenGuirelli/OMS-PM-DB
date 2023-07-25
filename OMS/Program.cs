@@ -2,6 +2,28 @@ using OMS;
 using OMS.OrderSenders;
 using OMS.Repositories;
 using PM.Configs;
+using Serilog;
+using System.Configuration;
+
+void ClearPath(string directoryPath)
+{
+    try
+    {
+        DirectoryInfo directoryInfo = new(directoryPath);
+        FileInfo[] files = directoryInfo.GetFiles();
+
+        foreach (FileInfo file in files)
+        {
+            file.Delete();
+        }
+
+        Log.Information("Arquivos excluídos com sucesso!");
+    }
+    catch (Exception ex)
+    {
+        Log.Error("Ocorreu um erro ao excluir os arquivos: {message}", ex.Message);
+    }
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +36,19 @@ builder.Services.AddSwaggerGen();
 
 var settings = builder.Configuration.Get<Settings>();
 
+//PmGlobalConfiguration.Logger.SetTarget(PmLogTarget.File, @"C:\rox\pm_tests");
+
+var loggingTarget = GetLoggingTarget(builder);
+var loggingDirectory = GetLoggingDirectory(builder);
+var loggingLevel = GetLoggingLevel(builder);
+
+PmGlobalConfiguration.Logger.SetTarget(
+    loggingTarget,
+    loggingLevel,
+    loggingDirectory);
+
+
+
 builder.Services.AddHostedService<StartupService>(services =>
 {
     var orderProcess = new OrderProcess(services.GetRequiredService<IOrderRepository>());
@@ -25,7 +60,7 @@ builder.Services.AddHostedService<StartupService>(services =>
     else
     {
         return new StartupService(
-            new InnerOrderSender(orderProcess, 
+            new InnerOrderSender(orderProcess,
                 new DropcopyGenerator.OrderGenerator(
                     settings!.SelfContainedSettings!.OrderQuantity,
                     settings!.SelfContainedSettings!.OrderExecutedQuantity)));
@@ -36,17 +71,18 @@ builder.Services.AddSingleton<IOrderRepository>(
     {
         if (settings.UseTraditionalMemoryMappedFiles)
         {
-            Console.WriteLine("usando arquivos mapeados em memória tradicionais");
+            Log.Information("usando arquivos mapeados em memória tradicionais");
             PmGlobalConfiguration.PmTarget = PM.Core.PmTargets.TraditionalMemoryMappedFile;
         }
         else
         {
-            Console.WriteLine("usando PM");
+            Log.Information("usando PM");
             PmGlobalConfiguration.PmTarget = PM.Core.PmTargets.PM;
         }
         PmGlobalConfiguration.PmInternalsFolder = settings.Pm.InternalsFolder;
+        ClearPath(PmGlobalConfiguration.PmInternalsFolder);
 
-        Console.WriteLine("Persistencia: " + settings.Persistency);
+        Log.Information("Persistencia: {persistency}", settings.Persistency);
         if (settings.Persistency.ToLower() == "sqlite")
             return new SqlLiteOrderRepository(settings.SqlLite!.ConnectionString);
 
@@ -61,7 +97,7 @@ builder.Services.AddSingleton<IOrderRepository>(
 
         if (settings.Persistency.ToLower() == "postgresqltransaction")
             return new PostgreSqlOrderRepositoryTransaction(settings.PostgreSQL!.ConnectionString);
-        
+
         if (settings.Persistency.ToLower() == "postgresqloptimized")
             return new PostgreSqlOptimizedOrderRepository(settings.PostgreSQL!.ConnectionString);
 
@@ -98,3 +134,42 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+static PmLogTarget GetLoggingTarget(WebApplicationBuilder builder)
+{
+    var target = builder.Configuration["Serilog:Target"].ToLower();
+    if (target == "file")
+    {
+        return PmLogTarget.File;
+    }
+    else if (target == "console")
+    {
+        return PmLogTarget.Console;
+    }
+    else
+    {
+        return PmLogTarget.None;
+    }
+}
+
+string? GetLoggingDirectory(WebApplicationBuilder builder)
+{
+    try
+    {
+        return builder.Configuration["Serilog:Directory"];
+    }
+    catch
+    {
+        return null;
+    }
+}
+
+Serilog.Events.LogEventLevel GetLoggingLevel(WebApplicationBuilder builder)
+{
+    var loggingLevel = builder.Configuration["Serilog:LogLevel"];
+    if (Enum.TryParse<Serilog.Events.LogEventLevel>(loggingLevel, out var result))
+    {
+        return result;
+    }
+    return Serilog.Events.LogEventLevel.Information;
+}
